@@ -17,11 +17,38 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix("auth")->group(function(){
+    
+    Route::prefix("usuarios")->group(function(){
 
-    Route::get('usuario-logado', function(){
-        return Usuario::with('permissoes')->where("id", Auth::user()->id)->first();
-    })->middleware('auth:api')
-    ->name('usuario.info');
+        Route::get('logado', 'App\Http\Controllers\Admin\UsuariosController@logged')
+        ->name('usuario.info');
+
+        Route::get('', 'App\Http\Controllers\Admin\UsuariosController@index')
+        ->name('usuarios.index');
+
+        Route::post('', 'App\Http\Controllers\Admin\UsuariosController@store')
+        ->name('usuarios.store');
+
+        Route::get('{id}', 'App\Http\Controllers\Admin\UsuariosController@show')
+        ->name('usuarios.show')
+        ->where(['id'=>'[0-9]+']);
+
+        Route::put('{id}', 'App\Http\Controllers\Admin\UsuariosController@update')
+        ->name('usuarios.update')
+        ->where(['id'=>'[0-9]+']);
+
+        Route::put('{id}/permissoes', 'App\Http\Controllers\Admin\UsuariosController@updatePermissoesUsuario')
+        ->name('usuarios.permissoes.update')
+        ->where(['id'=>'[0-9]+']);
+
+        Route::put('{id}/disable', 'App\Http\Controllers\Admin\UsuariosController@disable')
+        ->name('usuarios.disable')
+        ->where(['id'=>'[0-9]+']);
+
+        Route::put('{id}/enable', 'App\Http\Controllers\Admin\UsuariosController@enable')
+        ->name('usuarios.enable')
+        ->where(['id'=>'[0-9]+']);
+    });
 
 });
 
@@ -42,6 +69,7 @@ Route::prefix("administracao")->group(function(){
         Route::put('{id}', 'App\Http\Controllers\Admin\CargosController@update')
         ->name('cargos.update')
         ->where(['id'=>'[0-9]+']);
+        
     });
 
 });

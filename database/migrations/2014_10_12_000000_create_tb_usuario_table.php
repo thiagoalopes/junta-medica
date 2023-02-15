@@ -19,6 +19,10 @@ class CreateTbUsuarioTable extends Migration
             $table->string('email')->unique();
             $table->string('cpf')->unique();
             $table->string('senha');
+            $table->string('matricula')->unique();
+            $table->string('celular');
+            $table->boolean('isbloqueado')->default(false);
+
             $table->timestamps();
         });
     }

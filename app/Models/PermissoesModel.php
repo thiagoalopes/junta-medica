@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PermissoesModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'permissoes';
+    protected $table = 'tb_permissoes';
     public $timestamps = true;
 
     protected $fillable = [
@@ -19,4 +20,14 @@ class PermissoesModel extends Model
         'f_usuario',
         'f_medico',
     ];
+
+    function colunas()
+    {
+        return [
+            'f_admin',
+            'f_desenvolvedor',
+            'f_usuario',
+            'f_medico',
+        ];
+    }
 }
