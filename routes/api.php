@@ -15,13 +15,18 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::post('/oauth/token', 'App\Http\Controllers\Auth\LoginController@issueToken');
 
 Route::prefix("auth")->group(function(){
-    
+
+
     Route::prefix("usuarios")->group(function(){
 
         Route::get('logado', 'App\Http\Controllers\Admin\UsuariosController@logged')
         ->name('usuario.info');
+
+        Route::get('permissoes', 'App\Http\Controllers\Admin\UsuariosController@permissoes')
+        ->name('usuario.permissoes');
 
         Route::get('', 'App\Http\Controllers\Admin\UsuariosController@index')
         ->name('usuarios.index');
@@ -69,7 +74,7 @@ Route::prefix("administracao")->group(function(){
         Route::put('{id}', 'App\Http\Controllers\Admin\CargosController@update')
         ->name('cargos.update')
         ->where(['id'=>'[0-9]+']);
-        
+
     });
 
 });

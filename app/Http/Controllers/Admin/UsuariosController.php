@@ -27,8 +27,24 @@ class UsuariosController extends Controller
 
     public function logged()
     {
-        return Usuario::with('permissoes')
-            ->where("id", Auth::user()->id)->first();
+        $permissoes = new PermissoesModel();
+        $usuarioLogado = Auth::user();
+
+        $permissoes = PermissoesModel::select($permissoes->colunas())
+        ->where('cpf', $usuarioLogado->cpf )
+        ->first()->toArray();
+
+        $permissoeAtribuidas = [];
+
+        foreach ($permissoes as $key => $permissao) {
+            if($permissoes[$key] == 1)
+            {
+                array_push($permissoeAtribuidas, $key);
+            }
+        }
+
+        $usuarioLogado->permissoes = $permissoeAtribuidas;
+        return response()->json($usuarioLogado);
     }
 
     /**
@@ -176,10 +192,10 @@ class UsuariosController extends Controller
             if($permissaoModel)
             {
                 if($request->has('permissao'))
-                {   
+                {
                     $listaPermissao = [];
 
-                    foreach ($permissaoModel->colunas() as $coluna) 
+                    foreach ($permissaoModel->colunas() as $coluna)
                     {
                         if(in_array($coluna, $request->input('permissao')))
                         {

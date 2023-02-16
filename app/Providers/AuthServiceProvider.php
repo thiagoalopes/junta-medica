@@ -28,55 +28,66 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        Passport::routes();
+        //Passport::routes();
+        Passport::routes(function ($router) {
+            $router->forAuthorization();
+            //$router->forAccessTokens();
+            $router->forTransientTokens();
+            $router->forClients();
+            $router->forPersonalAccessTokens();
+        });
+
         Passport::tokensExpireIn(now()->addMinutes(30));
         Passport::refreshTokensExpireIn(now()->addMinutes(60));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
 
+        //Passport::cookie('refresh');
+
+
         //Passport::useTokenModel(Token::class);
 
         Gate::define('f_admin', function(Usuario $user){
-    
+
             $administrativo = PermissoesModel::where('cpf', $user->cpf)->first();
             if($administrativo != null && $administrativo->f_admin == '1')
             {
                 return true;
             }
             return false;
-    
+
         });
-    
+
         Gate::define('f_desenvolvedor', function(Usuario $user){
-    
+
             $administrativo = PermissoesModel::where('cpf', $user->cpf)->first();
             if($administrativo != null && $administrativo->f_desenvolvedor == '1')
             {
                 return true;
             }
             return false;
-    
+
         });
-    
+
         Gate::define('f_usuario', function(Usuario $user){
-    
+
             $administrativo = PermissoesModel::where('cpf', $user->cpf)->first();
             if($administrativo != null && $administrativo->f_usuario == '1')
             {
                 return true;
             }
             return false;
-    
+
         });
-    
+
         Gate::define('f_medico', function(Usuario $user){
-    
+
             $administrativo = PermissoesModel::where('cpf', $user->cpf)->first();
             if($administrativo != null && $administrativo->f_usuario == '1')
             {
                 return true;
             }
             return false;
-    
+
         });
     }
 
