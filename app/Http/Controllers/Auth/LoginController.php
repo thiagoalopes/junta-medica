@@ -17,14 +17,7 @@ class LoginController extends AccessTokenController
     {
         try {
 
-            if(!isset($request->getParsedBody()['username']))
-            {
-                throw new ExceptionOAuthServerException('The user credentials were incorrect.', 6, 'invalid_credentials', 401);
-            }
-
             $permissoes = new PermissoesModel();
-
-
             $usuario = Usuario::where('cpf', $request->getParsedBody()['username'])->first();
 
             $permissoes = PermissoesModel::select($permissoes->colunas())
@@ -62,11 +55,11 @@ class LoginController extends AccessTokenController
         }
         catch (ModelNotFoundException $e) { // email notfound
             //return error message
-            return response(["message" => "User not found"], 500);
+            return response(["message" => "User not found"], 404);
         }
         catch (OAuthServerException $e) { //password not correct..token not granted
             //return error message
-            return response(["message" => "The user credentials were incorrect.', 6, 'invalid_credentials"], 500);
+            return response(["message" => "The user credentials were incorrect.', 6, 'invalid_credentials"], 401);
         }
         catch (Exception $e) {
             ////return error message
