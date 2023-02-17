@@ -41,7 +41,7 @@ class AuthServiceProvider extends ServiceProvider
         Passport::refreshTokensExpireIn(now()->addMinutes(60));
         Passport::personalAccessTokensExpireIn(now()->addMonths(6));
 
-        //Passport::cookie('refresh');
+        //Passport::cookie('laravel_token');
 
 
         //Passport::useTokenModel(Token::class);

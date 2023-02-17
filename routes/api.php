@@ -20,10 +20,14 @@ use Illuminate\Support\Facades\Route;
 Route::prefix("auth")->group(function(){
 
 
+
     Route::prefix("usuarios")->group(function(){
 
         Route::get('logado', 'App\Http\Controllers\Admin\UsuariosController@logged')
         ->name('usuario.info');
+
+        Route::get('payload', 'App\Http\Controllers\Admin\UsuariosController@payload')
+        ->name('usuario.payload');
 
         Route::get('permissoes', 'App\Http\Controllers\Admin\UsuariosController@permissoes')
         ->name('usuario.permissoes');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Usuario;
+use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 use App\Models\PermissoesModel;
@@ -46,6 +47,30 @@ class UsuariosController extends Controller
         $usuarioLogado->permissoes = $permissoeAtribuidas;
         return response()->json($usuarioLogado);
     }
+
+    public function payload()
+    {
+        $permissoes = new PermissoesModel();
+        $usuarioLogado = Auth::user();
+
+        $permissoes = PermissoesModel::select($permissoes->colunas())
+        ->where('cpf', $usuarioLogado->cpf )
+        ->first()->toArray();
+
+        $permissoeAtribuidas = [];
+
+        foreach ($permissoes as $key => $permissao) {
+            if($permissoes[$key] == 1)
+            {
+                array_push($permissoeAtribuidas, $key);
+            }
+        }
+        $usuarioLogado->permissoes = $permissoeAtribuidas;
+        Arr::except($usuarioLogado, ['id','celular','matricula','email','isbloqueado']);
+
+        return response()->json($usuarioLogado);
+    }
+
 
     /**
      * Display a listing of the resource.
