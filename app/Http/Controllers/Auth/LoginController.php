@@ -2,68 +2,39 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Models\Usuario;
-use App\Models\PermissoesModel;
+use App\Exceptions\EntityNotFoundExpecion;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Laravel\Passport\Exceptions\OAuthServerException;
+use Illuminate\Support\Arr;
+use Illuminate\Database\QueryException;
 use Psr\Http\Message\ServerRequestInterface;
+use Laravel\Passport\Http\Controllers\HandlesOAuthErrors;
 use Laravel\Passport\Http\Controllers\AccessTokenController;
-use League\OAuth2\Server\Exception\OAuthServerException as ExceptionOAuthServerException;
 
 class LoginController extends AccessTokenController
 {
     public function issueToken(ServerRequestInterface $request)
     {
-        try {
+        try
+        {
+            $grantType = isset($request->getParsedBody()['grant_type'])?$request->getParsedBody()['grant_type']:null;
 
-            $permissoes = new PermissoesModel();
-            $usuario = Usuario::where('cpf', $request->getParsedBody()['username'])->first();
-
-            $permissoes = PermissoesModel::select($permissoes->colunas())
-            ->where('cpf', $usuario->cpf )
-            ->first()->toArray();
-
-            $permissoeAtribuidas = [];
-
-            foreach ($permissoes as $key => $permissao) {
-                if($permissoes[$key] == 1)
-                {
-                    array_push($permissoeAtribuidas, $key);
-                }
+            if($grantType && $grantType == 'refresh_token')
+            {
+                $request->s()['refresh_token'] = $request->getCookieParams()['refresh_token'];
             }
 
-            $usuario->permissoes = $permissoeAtribuidas;
+            $tokenContent = json_decode(parent::issueToken($request)->getContent(), 1);
 
-            //generate token
-            $tokenResponse = parent::issueToken($request);
-            //dd($tokenResponse);
-            //convert response to json string
-            $content = $tokenResponse->getContent();
+            return response()->json(Arr::except($tokenContent, ['refresh_token']))
+                ->withCookie(cookie('refresh_token', $tokenContent['refresh_token'], 60,'/', 'localhost'));
 
-            //convert json to array
-            $data = json_decode($content, true);
-
-            if(isset($data["error"]))
-                throw new ExceptionOAuthServerException('The user credentials were incorrect.', 6, 'invalid_credentials', 401);
-
-
-            //add access token to user
-            $data['data'] = $usuario;
-
-            return response()->json($data);
+        } catch(HandlesOAuthErrors $e)
+        {
+            return response()->json($e);
         }
-        catch (ModelNotFoundException $e) { // email notfound
-            //return error message
-            return response(["message" => "User not found"], 404);
-        }
-        catch (OAuthServerException $e) { //password not correct..token not granted
-            //return error message
-            return response(["message" => "The user credentials were incorrect.', 6, 'invalid_credentials"], 401);
-        }
-        catch (Exception $e) {
-            ////return error message
-            return response(["message" => "Internal server error"], 500);
+        catch(QueryException $e)
+        {
+            throw new EntityNotFoundExpecion('Invalid Client',$e, 404, $request->getUri()->getPath());
         }
     }
 }

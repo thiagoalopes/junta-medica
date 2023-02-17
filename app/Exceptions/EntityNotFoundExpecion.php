@@ -10,11 +10,15 @@ class EntityNotFoundExpecion extends Exception {
 
     protected $message;
     private $exception;
+    private $status;
+    private $path;
 
-    function __construct($message, $exception, Request $request)
+    function __construct($message, $exception, $status, $path)
     {
         $this->message = $message;
         $this->exception = $exception;
+        $this->status = $status;
+        $this->path = $path;
     }
 
     /**
@@ -35,7 +39,7 @@ class EntityNotFoundExpecion extends Exception {
      */
     public function render($request)
     {
-        return response()->json((array) new ErrorTemplate($this->message, 404, $request->url()), 404);
+        return response()->json((array) new ErrorTemplate($this->message, $this->status, $this->path), $this->status);
     }
 
 }

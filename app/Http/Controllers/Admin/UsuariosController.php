@@ -68,7 +68,8 @@ class UsuariosController extends Controller
         $usuarioLogado->permissoes = $permissoeAtribuidas;
         Arr::except($usuarioLogado, ['id','celular','matricula','email','isbloqueado']);
 
-        return response()->json($usuarioLogado);
+        return response()->json(null, 204)
+            ->withCookie(cookie('payload', $usuarioLogado, 60,'/', 'localhost'));
     }
 
 
@@ -162,7 +163,7 @@ class UsuariosController extends Controller
 
             if(!$usuario)
             {
-                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, $request);
+                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, 404, $request->url());
             }
 
             return response()->json($usuario);
@@ -185,7 +186,7 @@ class UsuariosController extends Controller
 
             if(!$usuario)
             {
-                throw new EntityNotFoundExpecion("Usuário não encontrado.", null, $request);
+                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, 404, $request->url());
             }
 
             $validated = $request->validate($usuario->rules(), $usuario->messages());
@@ -204,7 +205,7 @@ class UsuariosController extends Controller
 
             if(!$usuario)
             {
-                throw new EntityNotFoundExpecion("Usuário não encontrado.", null, $request);
+                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, 404, $request->url());
             }
 
             $permissaoModel = PermissoesModel::where('cpf', $usuario->cpf)->first();
@@ -248,7 +249,7 @@ class UsuariosController extends Controller
 
             if(!$usuario)
             {
-                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, $request);
+                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, 404, $request->url());
             }
 
             $usuario->isbloqueado = true;
@@ -266,7 +267,7 @@ class UsuariosController extends Controller
 
             if(!$usuario)
             {
-                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, $request);
+                throw new EntityNotFoundExpecion("Usuario não encontrado.", null, 404, $request->url());
             }
 
             $usuario->isbloqueado = false;
